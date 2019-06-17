@@ -1,5 +1,6 @@
 #!/bin/bash
 
+AndroidSystemVersion="21"
 AndroidSdkDir="$LOCALAPPDATA/Android/Sdk"
 AndroidCmakeExe="$AndroidSdkDir/cmake/3.10.2.4988404/bin/cmake.exe"
 AndroidNinjaExe="$AndroidSdkDir/cmake/3.10.2.4988404/bin/ninja.exe"
@@ -13,6 +14,31 @@ ProjectRootPath="android-project"
 BuildRootPath="android-build"
 SourceRootPath="llvm-src"
 
+PatchableFiles=( "$SourceRootPath/lib/Transforms/CMakeLists.txt" )
+PatchReplacePatterns=( "^add_subdirectory(Hello)$" )
+PatchReplaceValues=( "#add_subdirectory(Hello)" )
+
+echo "Patching LLVM Source Files..."
+PatchesLength=${#PatchableFiles[*]}
+for (( patchCounter=0; patchCounter < $PatchesLength; patchCounter++ ))
+do
+    patchFile=${PatchableFiles[$patchCounter]}
+    replacePattern=${PatchReplacePatterns[$patchCounter]}
+    replaceValue=${PatchReplaceValues[$patchCounter]}
+    
+    echo "Patching file : $patchFile ..."
+    if [ ! -f "$patchFile.orig" ]
+    then
+        cp "$patchFile" "$patchFile.orig"
+    fi
+    
+    echo "Replacing $replacePattern with $replaceValue ..."
+    sed -i "s/$replacePattern/$replaceValue/" "$patchFile"
+    echo "Successfully patched file : $patchFile !"
+done
+echo "Successfully patched LLVM Source Files!"
+
+echo "Building LLVM for Android..."
 ArchsLength=${#ArchTargets[*]}
 for (( archCounter=0; archCounter < $ArchsLength; archCounter++ ))
 do
@@ -21,7 +47,6 @@ do
     llvmTarget=${LlvmTargets[$archCounter]}
     projectDir="$ProjectRootPath/$archTarget"
     buildDir="$BuildRootPath/$archTarget"
-    buildFullPath=$(realpath "./$buildDir")
     
     if [ -d $projectDir ]
     then
@@ -38,10 +63,12 @@ do
     mkdir -p $projectDir
     echo "Creating Build directory : $buildDir ..."
     mkdir -p $buildDir
+    buildFullPath=$(realpath "./$buildDir")
     
     echo "Generating Project Files for Architecture : $archTarget ..."
-    pushd $projectDir
+    pushd $projectDir > /dev/null
     $AndroidCmakeExe \
+        -DBUILD_SHARED_LIBS=OFF \
         -DLLVM_BUILD_LLVM_DYLIB=ON \
         -DLLVM_BUILD_BENCHMARKS=OFF \
         -DLLVM_BUILD_EXAMPLES=OFF \
@@ -73,8 +100,8 @@ do
         -DCMAKE_INSTALL_PREFIX="$buildFullPath" \
         -DCMAKE_CROSSCOMPILING=True \
         -DCMAKE_SYSTEM_NAME=Android \
-        -DANDROID_PLATFORM=android-21 \
-        -DCMAKE_SYSTEM_VERSION=21 \
+        -DANDROID_PLATFORM="android-$AndroidSystemVersion" \
+        -DCMAKE_SYSTEM_VERSION="$AndroidSystemVersion" \
         -DCMAKE_ANDROID_NDK="$NdkBundle" \
         -DCMAKE_TOOLCHAIN_FILE="$ToolchainFile" \
         -DCMAKE_MAKE_PROGRAM="$AndroidNinjaExe" \
@@ -84,7 +111,7 @@ do
     echo "Building LLVM for Architecture : $archTarget ..."
     $AndroidCmakeExe --build . --target install
     
-    popd
+    popd > /dev/null
     echo "Successfully built LLVM for Architecture : $archTarget !"
 done
 echo "Successfully built LLVM for Android!"
