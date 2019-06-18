@@ -14,19 +14,19 @@ ProjectRootPath="android-project"
 BuildRootPath="android-build"
 SourceRootPath="llvm-src"
 
-PatchableFiles=( "$SourceRootPath/lib/Transforms/CMakeLists.txt" )
-PatchReplacePatterns=( "^add_subdirectory(Hello)$" )
-PatchReplaceValues=( "#add_subdirectory(Hello)" )
+PatchableSourceFiles=( "$SourceRootPath/lib/Transforms/CMakeLists.txt" )
+SourcePatchReplacePatterns=( "^add_subdirectory(Hello)$" )
+SourcePatchReplaceValues=( "#add_subdirectory(Hello)" )
 
 echo "Patching LLVM Source Files..."
-PatchesLength=${#PatchableFiles[*]}
+PatchesLength=${#PatchableSourceFiles[*]}
 for (( patchCounter=0; patchCounter < $PatchesLength; patchCounter++ ))
 do
-    patchFile=${PatchableFiles[$patchCounter]}
-    replacePattern=${PatchReplacePatterns[$patchCounter]}
-    replaceValue=${PatchReplaceValues[$patchCounter]}
+    patchFile=${PatchableSourceFiles[$patchCounter]}
+    replacePattern=${SourcePatchReplacePatterns[$patchCounter]}
+    replaceValue=${SourcePatchReplaceValues[$patchCounter]}
     
-    echo "Patching file : $patchFile ..."
+    echo "Patching Source File : $patchFile ..."
     if [ ! -f "$patchFile.orig" ]
     then
         cp "$patchFile" "$patchFile.orig"
@@ -34,7 +34,7 @@ do
     
     echo "Replacing $replacePattern with $replaceValue ..."
     sed -i "s/$replacePattern/$replaceValue/" "$patchFile"
-    echo "Successfully patched file : $patchFile !"
+    echo "Successfully patched Source File : $patchFile !"
 done
 echo "Successfully patched LLVM Source Files!"
 
@@ -97,6 +97,7 @@ do
         -DANDROID_NDK="$NdkBundle" \
         -DANDROID_ABI="$archTarget" \
         \
+        -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX="$buildFullPath" \
         -DCMAKE_CROSSCOMPILING=True \
         -DCMAKE_SYSTEM_NAME=Android \
