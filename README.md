@@ -8,7 +8,7 @@ Cross-compiling LLVM requires at a minimum that llvm-tblgen be compiled for the 
 ## Requirements
   - CMake - [https://cmake.org/download/](https://cmake.org/download/)
   - Visual Studio 2019 -or- MSVC Toolchain
-  - Bash Command Prompt
+  - MinGW Bash Prompt - [http://www.mingw.org/](http://www.mingw.org/)
 
 ## Steps
   - Download latest release of LLVM Source Code from [http://releases.llvm.org/](http://releases.llvm.org/)
