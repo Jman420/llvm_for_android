@@ -92,15 +92,15 @@ do
         -DLLVM_TARGETS_TO_BUILD="$llvmTarget" \
         \
         -DLLVM_TABLEGEN="../../host-build/bin/llvm-tblgen.exe" \
-        \
         -DPYTHON_EXECUTABLE="$NdkBundle/prebuilt/windows-x86_64/bin/python2.7.exe" \
+        \
         -DANDROID_NDK="$NdkBundle" \
         -DANDROID_ABI="$archTarget" \
         \
-        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_BUILD_TYPE="MinSizeRel" \
         -DCMAKE_INSTALL_PREFIX="$buildFullPath" \
-        -DCMAKE_CROSSCOMPILING=True \
-        -DCMAKE_SYSTEM_NAME=Android \
+        -DCMAKE_CROSSCOMPILING="True" \
+        -DCMAKE_SYSTEM_NAME="Android" \
         -DANDROID_PLATFORM="android-$AndroidSystemVersion" \
         -DCMAKE_SYSTEM_VERSION="$AndroidSystemVersion" \
         -DCMAKE_ANDROID_NDK="$NdkBundle" \
