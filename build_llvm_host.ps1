@@ -17,7 +17,7 @@ if (Test-Path $BuildDir) {
 Write-Output "Creating Host Project & Build Directories..."
 New-Item -ItemType directory -Force -Path $ProjectDir
 New-Item -ItemType directory -Force -Path $BuildDir
-$FullBuildPath = (Resolve-Path $BuildDir).Path
+$FullBuildPath = Resolve-Path $BuildDir
 
 Write-Output "Generating Host Project..."
 Push-Location $ProjectDir
