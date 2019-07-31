@@ -6,7 +6,7 @@ AndroidCmakeExe="$AndroidSdkDir/cmake/3.10.2.4988404/bin/cmake.exe"
 AndroidNinjaExe="$AndroidSdkDir/cmake/3.10.2.4988404/bin/ninja.exe"
 NdkBundle="$AndroidSdkDir/ndk-bundle/"
 ToolchainFile="$NdkBundle/build/cmake/android.toolchain.cmake"
-ArchTargets=( "armeabi-v7a" ) #"arm64-v8a" "x86" "x86_64" )
+ArchTargets=( "armeabi-v7a" "arm64-v8a" "x86" "x86_64" )
 ArchTriples=( "armv7a-linux-androideabi" "aarch64-linux-android" "i686-linux-android" "x86_64-linux-android" )
 LlvmTargets=( "ARM" "AArch64" "X86" "X86" )
 
@@ -48,6 +48,7 @@ do
     projectDir="$ProjectRootPath/$archTarget"
     buildDir="$BuildRootPath/$archTarget"
     
+    echo "Setting Up Build Environment for Architecture : $archTarget ..."
     if [ -d $projectDir ]
     then
         echo "Removing existing Project directory : $projectDir ..."
@@ -55,7 +56,7 @@ do
     fi
     if [ -d $buildDir ]
     then
-        echo "Removing existing Project directory : $buildDir ..."
+        echo "Removing existing Build directory : $buildDir ..."
         rm -rf "$buildDir"
     fi
     
@@ -80,7 +81,6 @@ do
         -DLLVM_TARGETS_TO_BUILD="$llvmTarget" \
         \
         -DLLVM_TABLEGEN="../../host-build/bin/llvm-tblgen.exe" \
-        -DPYTHON_EXECUTABLE="$NdkBundle/prebuilt/windows-x86_64/bin/python2.7.exe" \
         \
         -DLLVM_INCLUDE_BENCHMARKS=OFF \
         -DLLVM_INCLUDE_DOCS=OFF \
@@ -120,13 +120,6 @@ do
         exit 1
     fi
     popd > /dev/null
-    
-    #echo "Stripping libLLVM for Architecture : $archTarget ..."
-    #strip --strip-unneeded $buildFullPath\lib\libLLVM.so
-    #if [ $? -ne 0 ]; then
-    #    echo "Stripping failed for Architecture : $archTarget !"
-    #    exit 1
-    #fi
     
     echo "Successfully built LLVM for Architecture : $archTarget !"
 done
