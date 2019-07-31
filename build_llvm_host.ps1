@@ -49,9 +49,20 @@ Push-Location $ProjectDir
     -G "Visual Studio 16 2019" `
     -Thost=x64 `
     `
-    ../$SourceDir
+    "../$SourceDir"
+if (!$?) {
+    Write-Output "Project Generation failed!"
+    Pop-Location
+    exit 1
+}
 
 Write-Output "Building & Installing Host Binaries..."
 . $CmakeCmd --build . --target install
+if (!$?) {
+    Write-Output "Compilation failed!"
+    Pop-Location
+    exit 1
+}
+
 Pop-Location
 Write-Output "Successfully Built and Installed Host Binaries!"
